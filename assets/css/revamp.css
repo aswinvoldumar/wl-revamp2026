@@ -554,11 +554,29 @@ a.cs_btn.cs_style_2:hover::after {
 
 .cs_modern_difference .cs_grid_cards.cs_type_2 {
   gap: 18px;
+  overflow: visible;
+  width: 100%;
+}
+
+.cs_build_pin {
+  height: calc(100vh - 96px);
+  max-height: calc(100vh - 96px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background: var(--cream);
+  overflow: hidden;
+}
+
+.cs_build_pin_inner {
+  width: 100%;
 }
 
 .cs_modern_difference .cs_modern_card.cs_has_img {
   position: relative;
-  min-height: 380px;
+  height: min(58vh, 420px);
+  min-height: 280px;
   padding: 0 !important;
   overflow: hidden;
   border: none !important;
@@ -567,6 +585,7 @@ a.cs_btn.cs_style_2:hover::after {
   box-shadow: none !important;
   cursor: pointer;
   outline: none;
+  will-change: transform, opacity;
 }
 
 .cs_modern_difference .cs_modern_card.cs_has_img:focus-visible {
@@ -623,12 +642,6 @@ a.cs_btn.cs_style_2:hover::after {
   transition: max-height 0.4s ease, opacity 0.35s ease, margin 0.35s ease, transform 0.4s ease;
 }
 
-.cs_modern_difference .cs_modern_card.cs_has_img:hover,
-.cs_modern_difference .cs_modern_card.cs_has_img:focus-visible,
-.cs_modern_difference .cs_modern_card.cs_has_img.is-open {
-  transform: none;
-}
-
 .cs_modern_difference .cs_modern_card.cs_has_img:hover .cs_card_img_wrap img,
 .cs_modern_difference .cs_modern_card.cs_has_img:focus-visible .cs_card_img_wrap img,
 .cs_modern_difference .cs_modern_card.cs_has_img.is-open .cs_card_img_wrap img {
@@ -651,12 +664,39 @@ a.cs_btn.cs_style_2:hover::after {
 }
 
 @media (max-width: 991px) {
+  .cs_build_pin {
+    height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
+    padding: 20px 0;
+  }
+
   .cs_modern_difference .cs_modern_card.cs_has_img {
-    min-height: 300px;
+    height: min(42vh, 320px);
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 575px) {
+  .cs_build_pin {
+    height: auto;
+    max-height: none;
+    min-height: calc(100vh - 72px);
+    align-items: flex-start;
+    padding: 24px 0 40px;
+  }
+
+  .cs_modern_difference .cs_modern_card.cs_has_img {
+    height: 240px;
+    min-height: 240px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cs_modern_difference .cs_modern_card.cs_has_img {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   .cs_modern_difference .cs_card_img_wrap img,
   .cs_modern_difference .cs_card_desc,
   .cs_modern_difference .cs_card_info_box {
