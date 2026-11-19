@@ -736,11 +736,51 @@
 
     gsap.registerPlugin(ScrollTrigger);
 
-    function offscreenX() {
-      return -Math.min(window.innerWidth * 0.65, 420);
+    function dist() {
+      return Math.min(window.innerWidth * 0.55, 380);
     }
 
-    gsap.set(cards, { x: offscreenX, autoAlpha: 0 });
+    // Unique entrance per card: wave / flip / arc / spin-in
+    function entranceFor(index) {
+      var d = dist();
+      var presets = [
+        // Patios: wavy slide from left
+        {
+          from: { x: -d, y: 70, rotate: -14, scale: 0.88, autoAlpha: 0 },
+          through: { x: -d * 0.45, y: -55, rotate: 8, scale: 0.96, autoAlpha: 1, duration: 0.55 },
+          to: { x: 0, y: 0, rotate: 0, scale: 1, autoAlpha: 1, duration: 0.55 }
+        },
+        // Drainage: horizontal flip from left
+        {
+          from: { x: -d * 0.85, rotationY: 95, z: -80, autoAlpha: 0 },
+          through: { x: -d * 0.25, rotationY: 35, z: -20, autoAlpha: 1, duration: 0.5 },
+          to: { x: 0, rotationY: 0, z: 0, autoAlpha: 1, duration: 0.55 }
+        },
+        // Irrigation: drop-wave from top
+        {
+          from: { x: -d * 0.35, y: -160, rotate: 10, scale: 0.85, autoAlpha: 0 },
+          through: { x: d * 0.12, y: 45, rotate: -6, scale: 0.97, autoAlpha: 1, duration: 0.55 },
+          to: { x: 0, y: 0, rotate: 0, scale: 1, autoAlpha: 1, duration: 0.55 }
+        },
+        // Lawn Care: flip-up from bottom-right
+        {
+          from: { x: d * 0.55, y: 140, rotationX: 80, rotate: 8, autoAlpha: 0 },
+          through: { x: d * 0.15, y: -30, rotationX: 25, rotate: -4, autoAlpha: 1, duration: 0.55 },
+          to: { x: 0, y: 0, rotationX: 0, rotate: 0, autoAlpha: 1, duration: 0.55 }
+        }
+      ];
+      return presets[index] || presets[0];
+    }
+
+    gsap.set(cards, {
+      transformPerspective: 1100,
+      transformOrigin: '50% 50%',
+      autoAlpha: 0
+    });
+
+    cards.forEach(function (card, index) {
+      gsap.set(card, entranceFor(index).from);
+    });
 
     var mm = gsap.matchMedia();
 
@@ -752,9 +792,8 @@
 
     function createPinnedSequence(endDistance, scrubAmount, staggerGap) {
       var tl = gsap.timeline({
-        defaults: { ease: 'none' },
+        defaults: { ease: 'power2.inOut' },
         scrollTrigger: {
-          // Lock only the card stage in this exact full-cards view
           trigger: pinStage,
           start: function () { return 'top top+=' + headerOffset(); },
           end: endDistance,
@@ -766,12 +805,11 @@
       });
 
       cards.forEach(function (card, index) {
-        tl.fromTo(
-          card,
-          { x: offscreenX, autoAlpha: 0 },
-          { x: 0, autoAlpha: 1, duration: 1, ease: 'power2.out' },
-          index * staggerGap
-        );
+        var move = entranceFor(index);
+        var at = index * staggerGap;
+
+        tl.fromTo(card, move.from, Object.assign({}, move.through, { ease: 'sine.inOut' }), at);
+        tl.to(card, Object.assign({}, move.to, { ease: 'power2.out' }), at + (move.through.duration || 0.55));
       });
 
       // Hold the full card row locked on screen, then release
@@ -780,17 +818,22 @@
       return function () {
         if (tl.scrollTrigger) tl.scrollTrigger.kill();
         tl.kill();
-        gsap.set(cards, { clearProps: 'transform,opacity,visibility' });
-        gsap.set(cards, { x: offscreenX, autoAlpha: 0 });
+        gsap.set(cards, { clearProps: 'all' });
+        cards.forEach(function (card, index) {
+          gsap.set(card, Object.assign({
+            transformPerspective: 1100,
+            transformOrigin: '50% 50%'
+          }, entranceFor(index).from));
+        });
       };
     }
 
     mm.add('(min-width: 768px)', function () {
-      return createPinnedSequence('+=360%', 0.85, 0.6);
+      return createPinnedSequence('+=380%', 0.9, 0.65);
     });
 
     mm.add('(max-width: 767px)', function () {
-      return createPinnedSequence('+=300%', 0.7, 0.55);
+      return createPinnedSequence('+=320%', 0.75, 0.6);
     });
 
     window.addEventListener('load', function () {

@@ -556,6 +556,7 @@ a.cs_btn.cs_style_2:hover::after {
   gap: 18px;
   overflow: visible;
   width: 100%;
+  perspective: 1200px;
 }
 
 .cs_build_pin {
@@ -585,6 +586,8 @@ a.cs_btn.cs_style_2:hover::after {
   box-shadow: none !important;
   cursor: pointer;
   outline: none;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
   will-change: transform, opacity;
 }
 
