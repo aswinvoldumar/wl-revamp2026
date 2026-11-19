@@ -706,14 +706,138 @@
   }
 
   function buildCards() {
-    var cards = document.querySelectorAll('.cs_modern_difference .cs_modern_card');
-    if (!cards.length || !window.matchMedia('(hover: none)').matches) return;
-    cards.forEach(function (card) {
-      card.addEventListener('click', function () {
-        var open = card.classList.contains('is-open');
-        cards.forEach(function (other) { other.classList.remove('is-open'); });
-        if (!open) card.classList.add('is-open');
+    var section = document.querySelector('#build-cards') || document.querySelector('.cs_modern_difference');
+    var pinStage = document.querySelector('.cs_build_pin');
+    var cards = Array.prototype.slice.call(
+      document.querySelectorAll('.cs_modern_difference .cs_modern_card')
+    );
+    if (!section || !pinStage || !cards.length) return;
+
+    // Mobile tap-to-open for card descriptions
+    if (window.matchMedia('(hover: none)').matches) {
+      cards.forEach(function (card) {
+        card.addEventListener('click', function () {
+          var open = card.classList.contains('is-open');
+          cards.forEach(function (other) { other.classList.remove('is-open'); });
+          if (!open) card.classList.add('is-open');
+        });
       });
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      cards.forEach(function (card) {
+        card.style.opacity = '1';
+        card.style.transform = 'none';
+      });
+      return;
+    }
+
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    function dist() {
+      return Math.min(window.innerWidth * 0.55, 380);
+    }
+
+    // Unique entrance per card: wave / flip / arc / spin-in
+    function entranceFor(index) {
+      var d = dist();
+      var presets = [
+        // Patios: wavy slide from left
+        {
+          from: { x: -d, y: 70, rotate: -14, scale: 0.88, autoAlpha: 0 },
+          through: { x: -d * 0.45, y: -55, rotate: 8, scale: 0.96, autoAlpha: 1, duration: 0.55 },
+          to: { x: 0, y: 0, rotate: 0, scale: 1, autoAlpha: 1, duration: 0.55 }
+        },
+        // Drainage: horizontal flip from left
+        {
+          from: { x: -d * 0.85, rotationY: 95, z: -80, autoAlpha: 0 },
+          through: { x: -d * 0.25, rotationY: 35, z: -20, autoAlpha: 1, duration: 0.5 },
+          to: { x: 0, rotationY: 0, z: 0, autoAlpha: 1, duration: 0.55 }
+        },
+        // Irrigation: drop-wave from top
+        {
+          from: { x: -d * 0.35, y: -160, rotate: 10, scale: 0.85, autoAlpha: 0 },
+          through: { x: d * 0.12, y: 45, rotate: -6, scale: 0.97, autoAlpha: 1, duration: 0.55 },
+          to: { x: 0, y: 0, rotate: 0, scale: 1, autoAlpha: 1, duration: 0.55 }
+        },
+        // Lawn Care: flip-up from bottom-right
+        {
+          from: { x: d * 0.55, y: 140, rotationX: 80, rotate: 8, autoAlpha: 0 },
+          through: { x: d * 0.15, y: -30, rotationX: 25, rotate: -4, autoAlpha: 1, duration: 0.55 },
+          to: { x: 0, y: 0, rotationX: 0, rotate: 0, autoAlpha: 1, duration: 0.55 }
+        }
+      ];
+      return presets[index] || presets[0];
+    }
+
+    gsap.set(cards, {
+      transformPerspective: 1100,
+      transformOrigin: '50% 50%',
+      autoAlpha: 0
+    });
+
+    cards.forEach(function (card, index) {
+      gsap.set(card, entranceFor(index).from);
+    });
+
+    var mm = gsap.matchMedia();
+
+    function headerOffset() {
+      var header = document.querySelector('.cs_site_header');
+      var h = header ? header.offsetHeight : 80;
+      return Math.max(72, h + 16);
+    }
+
+    function createPinnedSequence(endDistance, scrubAmount, staggerGap) {
+      var tl = gsap.timeline({
+        defaults: { ease: 'power2.inOut' },
+        scrollTrigger: {
+          trigger: pinStage,
+          start: function () { return 'top top+=' + headerOffset(); },
+          end: endDistance,
+          pin: true,
+          scrub: scrubAmount,
+          anticipatePin: 1,
+          invalidateOnRefresh: true
+        }
+      });
+
+      cards.forEach(function (card, index) {
+        var move = entranceFor(index);
+        var at = index * staggerGap;
+
+        tl.fromTo(card, move.from, Object.assign({}, move.through, { ease: 'sine.inOut' }), at);
+        tl.to(card, Object.assign({}, move.to, { ease: 'power2.out' }), at + (move.through.duration || 0.55));
+      });
+
+      // Hold the full card row locked on screen, then release
+      tl.to({}, { duration: 0.7 });
+
+      return function () {
+        if (tl.scrollTrigger) tl.scrollTrigger.kill();
+        tl.kill();
+        gsap.set(cards, { clearProps: 'all' });
+        cards.forEach(function (card, index) {
+          gsap.set(card, Object.assign({
+            transformPerspective: 1100,
+            transformOrigin: '50% 50%'
+          }, entranceFor(index).from));
+        });
+      };
+    }
+
+    mm.add('(min-width: 768px)', function () {
+      return createPinnedSequence('+=380%', 0.9, 0.65);
+    });
+
+    mm.add('(max-width: 767px)', function () {
+      return createPinnedSequence('+=320%', 0.75, 0.6);
+    });
+
+    window.addEventListener('load', function () {
+      ScrollTrigger.refresh();
     });
   }
 
