@@ -434,7 +434,13 @@ a.cs_btn.cs_style_2:hover::after {
 }
 
 .cs_hero .cs_overlay {
-  background: linear-gradient(90deg, rgba(14, 36, 28, 0.78) 0%, rgba(14, 36, 28, 0.42) 48%, rgba(14, 36, 28, 0.18) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(8, 18, 14, 0.78) 0%,
+    rgba(10, 22, 16, 0.62) 42%,
+    rgba(10, 22, 16, 0.48) 100%
+  );
+  z-index: 2;
 }
 
 .cs_hero .cs_gradient_color_1,
