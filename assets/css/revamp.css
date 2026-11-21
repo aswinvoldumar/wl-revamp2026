@@ -485,6 +485,12 @@ a.cs_btn.cs_style_2:hover::after {
   align-items: center;
 }
 
+.cs_revamp_intro_copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .cs_revamp_intro h3 {
   font-size: clamp(36px, 4vw, 56px);
   margin-bottom: 20px;
@@ -500,7 +506,10 @@ a.cs_btn.cs_style_2:hover::after {
   width: 100%;
   height: 460px;
   object-fit: cover;
+  object-position: center;
   display: block;
+  border-top-right-radius: 72px;
+  border-bottom-right-radius: 72px;
 }
 
 @media (max-width: 991px) {
@@ -569,21 +578,44 @@ a.cs_btn.cs_style_2:hover::after {
   height: calc(100vh - 96px);
   max-height: calc(100vh - 96px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   box-sizing: border-box;
   background: var(--cream);
   overflow: hidden;
+  padding: 28px 0 32px;
 }
 
 .cs_build_pin_inner {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 28px;
+  height: 100%;
+}
+
+.cs_build_heading {
+  position: relative;
+  z-index: 5;
+  flex-shrink: 0;
+  background: var(--cream);
+  padding-top: 20px;
+  margin-bottom: 0;
+}
+
+.cs_build_pin .cs_grid_cards.cs_type_2 {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-content: center;
 }
 
 .cs_modern_difference .cs_modern_card.cs_has_img {
   position: relative;
-  height: min(58vh, 420px);
-  min-height: 280px;
+  height: min(48vh, 360px);
+  min-height: 240px;
   padding: 0 !important;
   overflow: hidden;
   border: none !important;
@@ -676,12 +708,16 @@ a.cs_btn.cs_style_2:hover::after {
   .cs_build_pin {
     height: calc(100vh - 80px);
     max-height: calc(100vh - 80px);
-    padding: 20px 0;
+    padding: 20px 0 24px;
+  }
+
+  .cs_build_pin_inner {
+    gap: 20px;
   }
 
   .cs_modern_difference .cs_modern_card.cs_has_img {
-    height: min(42vh, 320px);
-    min-height: 220px;
+    height: min(36vh, 280px);
+    min-height: 200px;
   }
 }
 
@@ -691,12 +727,12 @@ a.cs_btn.cs_style_2:hover::after {
     max-height: none;
     min-height: calc(100vh - 72px);
     align-items: flex-start;
-    padding: 24px 0 40px;
+    padding: 20px 0 40px;
   }
 
   .cs_modern_difference .cs_modern_card.cs_has_img {
-    height: 240px;
-    min-height: 240px;
+    height: 220px;
+    min-height: 220px;
   }
 }
 
