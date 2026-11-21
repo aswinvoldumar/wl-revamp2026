@@ -788,20 +788,34 @@
     function headerOffset() {
       var header = document.querySelector('.cs_site_header');
       var h = header ? header.offsetHeight : 80;
-      return Math.max(72, h + 16);
+      // Keep heading clear of sticky header while pinned
+      return Math.max(80, h + 12);
     }
 
+    function syncPinHeaderOffset() {
+      if (!pinStage) return;
+      pinStage.style.setProperty('--build-header-offset', headerOffset() + 'px');
+    }
+
+    syncPinHeaderOffset();
+    window.addEventListener('resize', syncPinHeaderOffset);
+
     function createPinnedSequence(endDistance, scrubAmount, staggerGap) {
+      syncPinHeaderOffset();
+
       var tl = gsap.timeline({
         defaults: { ease: 'power2.inOut' },
         scrollTrigger: {
           trigger: pinStage,
-          start: function () { return 'top top+=' + headerOffset(); },
+          // Pin flush to top; padding inside .cs_build_pin keeps heading below header
+          start: 'top top',
           end: endDistance,
           pin: true,
+          pinSpacing: true,
           scrub: scrubAmount,
           anticipatePin: 1,
-          invalidateOnRefresh: true
+          invalidateOnRefresh: true,
+          onRefresh: syncPinHeaderOffset
         }
       });
 

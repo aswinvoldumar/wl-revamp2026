@@ -510,6 +510,7 @@ a.cs_btn.cs_style_2:hover::after {
   display: block;
   border-top-right-radius: 72px;
   border-bottom-right-radius: 72px;
+  border-bottom-left-radius: 72px;
 }
 
 @media (max-width: 991px) {
@@ -575,15 +576,17 @@ a.cs_btn.cs_style_2:hover::after {
 }
 
 .cs_build_pin {
-  height: calc(100vh - 96px);
-  max-height: calc(100vh - 96px);
+  --build-header-offset: 96px;
+  height: 100vh;
+  max-height: 100vh;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   box-sizing: border-box;
   background: var(--cream);
+  /* Keep both axes the same — mixed hidden/visible becomes auto and shows a scrollbar */
   overflow: hidden;
-  padding: 28px 0 32px;
+  padding: var(--build-header-offset) 0 40px;
 }
 
 .cs_build_pin_inner {
@@ -591,31 +594,35 @@ a.cs_btn.cs_style_2:hover::after {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 28px;
-  height: 100%;
+  gap: 18px;
+  min-height: 0;
+  height: auto;
+  max-height: calc(100% - 8px);
 }
 
 .cs_build_heading {
   position: relative;
-  z-index: 5;
+  z-index: 20;
   flex-shrink: 0;
   background: var(--cream);
-  padding-top: 20px;
+  padding-top: 8px;
+  padding-bottom: 0;
   margin-bottom: 0;
 }
 
 .cs_build_pin .cs_grid_cards.cs_type_2 {
   position: relative;
   z-index: 1;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
-  align-content: center;
+  align-content: flex-start;
+  padding-bottom: 8px;
 }
 
 .cs_modern_difference .cs_modern_card.cs_has_img {
   position: relative;
-  height: min(48vh, 360px);
-  min-height: 240px;
+  height: min(30vh, 240px);
+  min-height: 190px;
   padding: 0 !important;
   overflow: hidden;
   border: none !important;
@@ -706,33 +713,33 @@ a.cs_btn.cs_style_2:hover::after {
 
 @media (max-width: 991px) {
   .cs_build_pin {
-    height: calc(100vh - 80px);
-    max-height: calc(100vh - 80px);
-    padding: 20px 0 24px;
+    --build-header-offset: 84px;
+    padding: var(--build-header-offset) 0 40px;
   }
 
   .cs_build_pin_inner {
-    gap: 20px;
+    gap: 14px;
   }
 
   .cs_modern_difference .cs_modern_card.cs_has_img {
-    height: min(36vh, 280px);
-    min-height: 200px;
+    height: min(28vh, 220px);
+    min-height: 180px;
   }
 }
 
 @media (max-width: 575px) {
   .cs_build_pin {
+    --build-header-offset: 72px;
     height: auto;
     max-height: none;
-    min-height: calc(100vh - 72px);
+    min-height: 100vh;
     align-items: flex-start;
-    padding: 20px 0 40px;
+    padding: var(--build-header-offset) 0 40px;
   }
 
   .cs_modern_difference .cs_modern_card.cs_has_img {
-    height: 220px;
-    min-height: 220px;
+    height: 190px;
+    min-height: 190px;
   }
 }
 
