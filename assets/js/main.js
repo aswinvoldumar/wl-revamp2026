@@ -741,13 +741,14 @@
     }
 
     // Unique entrance per card: wave / flip / arc / spin-in
+    // Keep vertical travel modest so cards stay under the pinned heading
     function entranceFor(index) {
       var d = dist();
       var presets = [
         // Patios: wavy slide from left
         {
-          from: { x: -d, y: 70, rotate: -14, scale: 0.88, autoAlpha: 0 },
-          through: { x: -d * 0.45, y: -55, rotate: 8, scale: 0.96, autoAlpha: 1, duration: 0.55 },
+          from: { x: -d, y: 48, rotate: -12, scale: 0.9, autoAlpha: 0 },
+          through: { x: -d * 0.4, y: 18, rotate: 6, scale: 0.97, autoAlpha: 1, duration: 0.55 },
           to: { x: 0, y: 0, rotate: 0, scale: 1, autoAlpha: 1, duration: 0.55 }
         },
         // Drainage: horizontal flip from left
@@ -756,16 +757,16 @@
           through: { x: -d * 0.25, rotationY: 35, z: -20, autoAlpha: 1, duration: 0.5 },
           to: { x: 0, rotationY: 0, z: 0, autoAlpha: 1, duration: 0.55 }
         },
-        // Irrigation: drop-wave from top
+        // Irrigation: soft slide from left (avoid flying over heading)
         {
-          from: { x: -d * 0.35, y: -160, rotate: 10, scale: 0.85, autoAlpha: 0 },
-          through: { x: d * 0.12, y: 45, rotate: -6, scale: 0.97, autoAlpha: 1, duration: 0.55 },
+          from: { x: -d * 0.45, y: 36, rotate: 8, scale: 0.9, autoAlpha: 0 },
+          through: { x: d * 0.08, y: 12, rotate: -4, scale: 0.98, autoAlpha: 1, duration: 0.55 },
           to: { x: 0, y: 0, rotate: 0, scale: 1, autoAlpha: 1, duration: 0.55 }
         },
         // Lawn Care: flip-up from bottom-right
         {
-          from: { x: d * 0.55, y: 140, rotationX: 80, rotate: 8, autoAlpha: 0 },
-          through: { x: d * 0.15, y: -30, rotationX: 25, rotate: -4, autoAlpha: 1, duration: 0.55 },
+          from: { x: d * 0.5, y: 90, rotationX: 70, rotate: 6, autoAlpha: 0 },
+          through: { x: d * 0.12, y: 16, rotationX: 20, rotate: -3, autoAlpha: 1, duration: 0.55 },
           to: { x: 0, y: 0, rotationX: 0, rotate: 0, autoAlpha: 1, duration: 0.55 }
         }
       ];
@@ -787,20 +788,34 @@
     function headerOffset() {
       var header = document.querySelector('.cs_site_header');
       var h = header ? header.offsetHeight : 80;
-      return Math.max(72, h + 16);
+      // Keep heading clear of sticky header while pinned
+      return Math.max(80, h + 12);
     }
 
+    function syncPinHeaderOffset() {
+      if (!pinStage) return;
+      pinStage.style.setProperty('--build-header-offset', headerOffset() + 'px');
+    }
+
+    syncPinHeaderOffset();
+    window.addEventListener('resize', syncPinHeaderOffset);
+
     function createPinnedSequence(endDistance, scrubAmount, staggerGap) {
+      syncPinHeaderOffset();
+
       var tl = gsap.timeline({
         defaults: { ease: 'power2.inOut' },
         scrollTrigger: {
           trigger: pinStage,
-          start: function () { return 'top top+=' + headerOffset(); },
+          // Pin flush to top; padding inside .cs_build_pin keeps heading below header
+          start: 'top top',
           end: endDistance,
           pin: true,
+          pinSpacing: true,
           scrub: scrubAmount,
           anticipatePin: 1,
-          invalidateOnRefresh: true
+          invalidateOnRefresh: true,
+          onRefresh: syncPinHeaderOffset
         }
       });
 
